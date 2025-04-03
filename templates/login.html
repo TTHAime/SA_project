@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>เข้าสู่ระบบคลังสินค้า</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <style>
+        .login-container {
+            max-width: 400px;
+            margin: 100px auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 6px 24px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+
+        .login-container h2 {
+            margin-bottom: 24px;
+        }
+
+        .login-container form input[type="text"],
+        .login-container form input[type="password"] {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+
+        .login-container form input[type="submit"] {
+            width: 100%;
+            padding: 12px;
+            background-color: #2575fc;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .login-container form input[type="submit"]:hover {
+            background-color: #1a5edb;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="login-container">
+        <h2>🔐 เข้าสู่ระบบ</h2>
+        <form action="/login" method="post">
+            <input type="text" name="username" placeholder="ชื่อผู้ใช้" required />
+            <input type="password" name="password" placeholder="รหัสผ่าน" required />
+            <input type="submit" value="เข้าสู่ระบบ" />
+        </form>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>📦 รายชื่อคลังสินค้า</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+    <div class="container">
+        <h2>🏬 รายชื่อคลังสินค้า</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>ชื่อโกดัง</th>
+                    <th>สถานที่</th>
+                    <th>การจัดการ</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for w in warehouses %}
+                <tr>
+                    <td>{{ w['name'] }}</td>
+                    <td>{{ w['location'] }}</td>
+                    <td>
+                        <a href="/warehouse/{{ w['warehouseID'] }}">🔍 ดูสินค้า</a> |
+                        <a href="/warehouse/{{ w['warehouseID'] }}/logs">📜 Logs</a> |
+                        <form action="/warehouse/delete/{{ w['warehouseID'] }}" method="post" style="display:inline;"
+                            onsubmit="return confirm('คุณต้องการลบคลังนี้หรือไม่?');">
+                            <button type="submit">🗑 ลบ</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <h3>➕ เพิ่มคลังสินค้าใหม่</h3>
+        <form action="/warehouse/add" method="post">
+            <input type="text" name="name" placeholder="ชื่อคลัง" required>
+            <input type="text" name="location" placeholder="สถานที่">
+            <input type="submit" value="เพิ่มคลัง">
+        </form>
+
+        <p><a href="/logout">🔓 ออกจากระบบ</a></p>
+    </div>
+</body>
+
+</html>

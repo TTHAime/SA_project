@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>คลัง {{ warehouse['name'] }}</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+    <div class="container">
+        <h2>📦 สินค้าในคลัง: {{ warehouse['name'] }}</h2>
+        <p>📍 สถานที่: {{ warehouse['location'] }}</p>
+
+        {% if inventory %}
+        <table>
+            <thead>
+                <tr>
+                    <th>สินค้า</th>
+                    <th>จำนวน</th>
+                    <th>จัดการ</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in inventory %}
+                <tr>
+                    <td>{{ item['product'] }}</td>
+                    <td>{{ item['quantity'] }}</td>
+                    <td>
+                        <form
+                            action="/warehouse/{{ warehouse['warehouseID'] }}/adjust_inventory/{{ item['inventoryID'] }}"
+                            method="post" style="display:inline;">
+                            <input type="hidden" name="delta" value="-1">
+                            <button type="submit" {% if item['quantity'] <=0 %} disabled {% endif %}>➖</button>
+                        </form>
+
+                        <form
+                            action="/warehouse/{{ warehouse['warehouseID'] }}/adjust_inventory/{{ item['inventoryID'] }}"
+                            method="post" style="display:inline;">
+                            <input type="number" name="delta" value="1" style="width: 60px;">
+                            <button type="submit">ปรับ</button>
+                        </form>
+
+                        <form
+                            action="/warehouse/{{ warehouse['warehouseID'] }}/delete_inventory/{{ item['inventoryID'] }}"
+                            method="post" style="display:inline;"
+                            onsubmit="return confirm('ลบสินค้านี้ออกจากคลังหรือไม่?');">
+                            <button type="submit" {% if item['quantity']> 0 %} disabled title="ต้องลดให้เหลือ 0 ก่อนลบ"
+                                {% endif %}>🗑 ลบ</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>❗ ยังไม่มีสินค้าในคลังนี้</p>
+        {% endif %}
+
+        <h3>➕ เพิ่มสินค้าเข้าคลัง</h3>
+        <form action="/warehouse/{{ warehouse['warehouseID'] }}/add_inventory" method="post">
+            <label>สินค้า:</label>
+            <select name="product_id">
+                {% for p in products %}
+                <option value="{{ p['productID'] }}">{{ p['name'] }}</option>
+                {% endfor %}
+            </select>
+
+            <label>จำนวน:</label>
+            <input type="number" name="quantity" min="1" required>
+            <input type="submit" value="เพิ่ม">
+        </form>
+
+        <h3>🆕 เพิ่มสินค้าใหม่เข้าสู่ระบบ</h3>
+        <form action="/products/add" method="post">
+            <input type="text" name="name" placeholder="ชื่อสินค้า" required>
+            <input type="text" name="description" placeholder="รายละเอียด">
+            <input type="number" step="0.01" name="cost" placeholder="ต้นทุน">
+            <input type="number" step="0.01" name="price" placeholder="ราคาขาย">
+            <input type="text" name="category" placeholder="หมวดหมู่">
+            <input type="submit" value="เพิ่มสินค้าใหม่">
+        </form>
+
+        <p><a href="/warehouses">🔙 กลับหน้าคลัง</a></p>
+    </div>
+</body>
+
+</html>
