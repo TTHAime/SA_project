@@ -5,9 +5,42 @@
     <meta charset="UTF-8">
     <title>คลัง {{ warehouse['name'] }}</title>
     <link rel="stylesheet" href="/static/style.css">
+    <style>
+        #flash-messages {
+            list-style: none;
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            padding: 0;
+            margin: 0;
+        }
+
+        .flash {
+            background-color: #ffe0e0;
+            color: #a94442;
+            padding: 10px 15px;
+            margin-bottom: 10px;
+            border: 1px solid #f5c6cb;
+            border-radius: 6px;
+            font-weight: bold;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+        }
+    </style>
 </head>
 
 <body>
+    <!-- 🔔 Flash Message -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <ul id="flash-messages">
+        {% for category, message in messages %}
+        <li class="flash {{ category }}">{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
+
     <div class="container">
         <h2>📦 สินค้าในคลัง: {{ warehouse['name'] }}</h2>
         <p>📍 สถานที่: {{ warehouse['location'] }}</p>
@@ -45,8 +78,15 @@
                             action="/warehouse/{{ warehouse['warehouseID'] }}/delete_inventory/{{ item['inventoryID'] }}"
                             method="post" style="display:inline;"
                             onsubmit="return confirm('ลบสินค้านี้ออกจากคลังหรือไม่?');">
-                            <button type="submit" {% if item['quantity']> 0 %} disabled title="ต้องลดให้เหลือ 0 ก่อนลบ"
-                                {% endif %}>🗑 ลบ</button>
+                            {% if item['quantity'] == 0 %}
+                            <form
+                                action="/warehouse/{{ warehouse['warehouseID'] }}/delete_inventory/{{ item['inventoryID'] }}"
+                                method="post" style="display:inline;"
+                                onsubmit="return confirm('ลบสินค้านี้ออกจากคลังหรือไม่?');">
+                                <button type="submit">🗑 ลบ</button>
+                            </form>
+                            {% endif %}
+
                         </form>
                     </td>
                 </tr>
@@ -83,6 +123,14 @@
 
         <p><a href="/warehouses">🔙 กลับหน้าคลัง</a></p>
     </div>
+
+    <script>
+        // 🔄 ซ่อน popup flash หลัง 3 วิ
+        setTimeout(function () {
+            const flash = document.getElementById("flash-messages");
+            if (flash) flash.style.display = "none";
+        }, 3000);
+    </script>
 </body>
 
 </html>

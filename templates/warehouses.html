@@ -5,9 +5,66 @@
     <meta charset="UTF-8">
     <title>📦 รายชื่อคลังสินค้า</title>
     <link rel="stylesheet" href="/static/style.css">
+    <style>
+        /* 🔔 Flash popup */
+        #flash-messages {
+            list-style: none;
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            padding: 0;
+            margin: 0;
+        }
+
+        .flash {
+            background-color: #ffe0e0;
+            color: #a94442;
+            padding: 10px 15px;
+            margin-bottom: 10px;
+            border: 1px solid #f5c6cb;
+            border-radius: 6px;
+            font-weight: bold;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            border: 1px solid #ccc;
+            padding: 12px;
+            text-align: left;
+        }
+
+        form {
+            margin-top: 20px;
+        }
+
+        input[type="text"],
+        input[type="submit"] {
+            padding: 8px;
+            margin: 5px 0;
+        }
+    </style>
 </head>
 
 <body>
+    <!-- 🔔 Flash Message -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <ul id="flash-messages">
+        {% for category, message in messages %}
+        <li class="flash {{ category }}">{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
+
     <div class="container">
         <h2>🏬 รายชื่อคลังสินค้า</h2>
 
@@ -46,6 +103,14 @@
 
         <p><a href="/logout">🔓 ออกจากระบบ</a></p>
     </div>
+
+    <!-- 🔄 Auto Hide Flash -->
+    <script>
+        setTimeout(function () {
+            const flash = document.getElementById("flash-messages");
+            if (flash) flash.style.display = "none";
+        }, 3000);
+    </script>
 </body>
 
 </html>

@@ -1,11 +1,10 @@
-from flask import Flask, render_template, request, redirect, session, g
+from flask import Flask, render_template, request, redirect, session, g, flash
 import sqlite3
 
 app = Flask(__name__)
 app.secret_key = 'supersecret'
 DATABASE = 'database.db'
 
-# ================= DATABASE =================
 def get_db():
     if 'db' not in g:
         g.db = sqlite3.connect(DATABASE)
@@ -18,7 +17,7 @@ def close_db(error):
     if db is not None:
         db.close()
 
-# ================= LOGIN =================
+# -------------------- LOGIN --------------------
 @app.route('/')
 def login():
     return render_template('login.html')
@@ -34,14 +33,15 @@ def do_login():
         session['role'] = user['role']
         return redirect('/warehouses')
     else:
-        return "Login Failed", 401
+        flash("ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง", "error")
+        return redirect('/')
 
 @app.route('/logout')
 def logout():
     session.clear()
     return redirect('/')
 
-# ================= WAREHOUSE =================
+# -------------------- WAREHOUSE --------------------
 @app.route('/warehouses')
 def view_warehouses():
     db = get_db()
@@ -65,7 +65,8 @@ def delete_warehouse(warehouse_id):
     db = get_db()
     check = db.execute('SELECT COUNT(*) as count FROM inventory WHERE warehouseID = ?', (warehouse_id,)).fetchone()
     if check['count'] > 0:
-        return "❌ ไม่สามารถลบคลังได้ เพราะยังมีสินค้าคงคลัง", 400
+        flash("❌ ไม่สามารถลบคลังได้ เพราะยังมีสินค้าคงคลัง", "error")
+        return redirect('/warehouses')
     db.execute('DELETE FROM warehouses WHERE warehouseID = ?', (warehouse_id,))
     db.commit()
     if 'user_id' in session:
@@ -107,7 +108,8 @@ def delete_inventory_in_warehouse(warehouse_id, inventory_id):
     db = get_db()
     current = db.execute('SELECT quantity FROM inventory WHERE inventoryID = ?', (inventory_id,)).fetchone()
     if current and current['quantity'] > 0:
-        return "❌ ไม่สามารถลบสินค้าได้: quantity ยังไม่เป็น 0", 400
+        flash("❌ ไม่สามารถลบสินค้าได้: quantity ต้องเป็น 0 ก่อน", "error")
+        return redirect(f'/warehouse/{warehouse_id}')
     db.execute('DELETE FROM inventory WHERE inventoryID = ?', (inventory_id,))
     db.commit()
     if 'user_id' in session:
@@ -145,7 +147,7 @@ def warehouse_logs(warehouse_id):
     ''', (f'%warehouseID={warehouse_id}%',)).fetchall()
     return render_template('warehouse_logs.html', warehouse=warehouse, logs=logs)
 
-# ================= PRODUCTS =================
+# -------------------- PRODUCTS --------------------
 @app.route('/products/add', methods=['POST'])
 def add_product():
     name = request.form['name']
@@ -156,7 +158,8 @@ def add_product():
     db = get_db()
     existing = db.execute('SELECT * FROM products WHERE name = ?', (name,)).fetchone()
     if existing:
-        return "❌ ชื่อสินค้านี้มีอยู่ในระบบแล้ว", 400
+        flash("❌ ชื่อสินค้านี้มีอยู่ในระบบแล้ว", "error")
+        return redirect(request.referrer or '/warehouses')
     db.execute('INSERT INTO products (name, description, cost, price, category) VALUES (?, ?, ?, ?, ?)', (name, description, cost, price, category))
     db.commit()
     if 'user_id' in session:
@@ -164,7 +167,6 @@ def add_product():
         db.commit()
     return redirect(request.referrer or '/warehouses')
 
-
-# ================= RUN =================
+# -------------------- RUN --------------------
 if __name__ == '__main__':
     app.run(debug=True)

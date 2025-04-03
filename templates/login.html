@@ -6,55 +6,112 @@
     <title>เข้าสู่ระบบคลังสินค้า</title>
     <link rel="stylesheet" href="/static/style.css">
     <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(to right, #6a11cb, #2575fc);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
         .login-container {
-            max-width: 400px;
-            margin: 100px auto;
+            width: 100%;
+            max-width: 500px;
             background-color: white;
-            padding: 30px;
+            padding: 40px 50px;
             border-radius: 16px;
-            box-shadow: 0 6px 24px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
             text-align: center;
         }
 
         .login-container h2 {
-            margin-bottom: 24px;
+            margin-bottom: 30px;
+            font-size: 26px;
+            font-weight: bold;
+            color: #333;
         }
 
-        .login-container form input[type="text"],
-        .login-container form input[type="password"] {
+        .login-container input[type="text"],
+        .login-container input[type="password"] {
             width: 100%;
-            padding: 12px;
-            margin: 10px 0;
+            padding: 14px;
+            margin-bottom: 18px;
             border: 1px solid #ccc;
-            border-radius: 8px;
+            border-radius: 10px;
+            font-size: 16px;
         }
 
-        .login-container form input[type="submit"] {
+        .login-container input[type="submit"] {
             width: 100%;
-            padding: 12px;
+            padding: 14px;
+            font-size: 16px;
             background-color: #2575fc;
             color: white;
             border: none;
-            border-radius: 8px;
-            font-size: 16px;
+            border-radius: 10px;
             cursor: pointer;
+            transition: background-color 0.3s ease;
         }
 
-        .login-container form input[type="submit"]:hover {
+        .login-container input[type="submit"]:hover {
             background-color: #1a5edb;
+        }
+
+        /* 🔔 Flash popup */
+        #flash-messages {
+            list-style: none;
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            padding: 0;
+            margin: 0;
+        }
+
+        .flash {
+            background-color: #ffe0e0;
+            color: #a94442;
+            padding: 10px 15px;
+            margin-bottom: 10px;
+            border: 1px solid #f5c6cb;
+            border-radius: 6px;
+            font-weight: bold;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
         }
     </style>
 </head>
 
 <body>
+    <!-- 🔔 Flash Message -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <ul id="flash-messages">
+        {% for category, message in messages %}
+        <li class="flash {{ category }}">{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
+
     <div class="login-container">
-        <h2>🔐 เข้าสู่ระบบ</h2>
+        <h2>Trade Gecko</h2>
         <form action="/login" method="post">
-            <input type="text" name="username" placeholder="ชื่อผู้ใช้" required />
-            <input type="password" name="password" placeholder="รหัสผ่าน" required />
-            <input type="submit" value="เข้าสู่ระบบ" />
+            <input type="text" name="username" placeholder="username" required />
+            <input type="password" name="password" placeholder="password" required />
+            <input type="submit" value="login" />
         </form>
     </div>
+
+    <!-- 🔄 Hide Flash After Delay -->
+    <script>
+        setTimeout(function () {
+            const flash = document.getElementById("flash-messages");
+            if (flash) flash.style.display = "none";
+        }, 3000);
+    </script>
 </body>
 
 </html>
